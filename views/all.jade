@@ -1,0 +1,244 @@
+doctype html
+html
+    head
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui')
+        meta(name='apple-mobile-web-app-capable', content='yes')
+        meta(name='apple-mobile-web-app-status-bar-style', content='black')
+        title bong
+        //
+           Path to Framework7 Library CSS
+        link(rel='stylesheet', href='css/framework7.min.css')
+        //
+           Path to your custom app styles
+        link(rel='stylesheet', href='css/my-app.css')
+        script(src='js/jquery.min.js')
+        script(src='http://xiaocaozone.net/public/static/js/jquery.easing.1.3.js')
+    body
+        .hidden #{myuID}
+        //
+           Status bar overlay for fullscreen mode
+        .statusbar-overlay
+        //
+           Panels overlay
+        .panel-overlay
+        //
+           Left panel with reveal effect
+        .panel.panel-left.panel-reveal
+            .content-block
+                p Left panel content goes here
+        //
+           Right panel with cover effect
+        .panel.panel-right.panel-cover
+            .content-block
+                p Right panel content goes here
+        //
+           Views, and they are tabs
+        //
+           We need to set "toolbar-through" class on it to keep space for our tab bar
+        .views.tabs.toolbar-through
+            //
+               Your first view, it is also a .tab and should have "active" class to make it visible by default
+            #userinfo.view.view-main.tab.active
+                //
+                   Pages
+                .pages
+                    //
+                       Page, data-page contains page name
+                    .page(data-page='index-1')
+                        //
+                           Scrollable page content
+                        #userinfo-content.page-content
+                            #userinfo-logo.content-block-logo
+                                img(src='img/logo.jpg')
+                            #userinfo-title.content-block-title 欢迎你
+                            #userinfo-name.content-block-name 欢迎你
+                            #userinfo-data.content-block
+                                hr
+                                table#userinfo-table.userinfo-data-table
+                                    tr
+                                        td 强壮度
+                                        td
+                                            #userinfo-monsterAtk.progress.progress-striped.active
+                                                .progress-bar(role='progressbar', aria-valuenow='20', aria-valuemin='0', aria-valuemax='100', style='width: 20%;')
+                                                    span#userinfo-monsterAtk-show.sr-only 60% Complete
+                                    tr
+                                        td 血量
+                                        td
+                                            #user-info-monsterHp.progress.progress-striped.active
+                                                .progress-bar(role='progressbar', aria-valuenow='90', aria-valuemin='0', aria-valuemax='100', style='width: 90%;')
+                                                    span#user-info-monsterHp-show.sr-only 60% Complete
+
+                                div.register
+                                    button#btn-register.btn.btn-default 我今天到啦~~
+                                hr
+            //
+               Second view (for second wrap)
+            #search.view.tab
+                //
+                   We can make with view with navigation, let's add Top Navbar
+                .fight-sign
+                #search-navbar.navbar
+                    .navbar-inner
+                        #search-title.center.sliding Search result
+                .pages.navbar-through
+                    .page(data-page='index-2')
+                        .page-content
+                            .content-block
+                                p 决斗吧，少年~~
+                            .list-block
+                                #blood.progress.progress-striped.active
+                                    #blood-bar.progress-bar(role='progressbar', aria-valuenow='100', aria-valuemin='0', aria-valuemax='1000', style='width: 100%;')
+                                        span.sr-only bllod
+
+                                //
+                                    for search
+                                ul#search-panel.search-panel
+                                    li
+                                        a.search-item.item-link(href='#')
+                                            .item-content
+                                                .item-inner
+                                                    .search-title 用户名
+                                                    .search-rank 等级
+                                                    .fight 决斗
+                                    li
+                                        a.search-item.item-link(href='#')
+                                            .item-content
+                                                .item-inner
+                                                    .item-title 用户名
+                                                    .item-rank 等级
+                                                    .fight 决斗
+                                //
+                                   for fight
+                                ul.fight-panel
+                                    li
+                                        a.fight-item.item-link(href='#', data='123')
+                                            .item-content
+                                                .item-inner
+                                                    .fight-title 火攻
+                                                    .fight-rank x10
+                                                    img.fight-img(src='img/what.jpg')
+                                    li
+                                        a.fight-item.item-link(href='#', data='123')
+                                            .item-content
+                                                .item-inner
+                                                    .fight-title 水攻
+                                                    .fight-rank x5
+                                                    img.fight-img(src='img/what.jpg')
+                                    li
+                                        a.fight-item.item-link(href='#', data='123')
+                                            .item-content
+                                                .item-inner
+                                                    .fight-title 纠结纠结攻击
+                                                    .fight-rank x15
+                                                    img.fight-img(src='img/what.jpg')
+                                    button#btn-result.btn.btn-default 结束战斗
+            #view-3.view.tab
+                .pages
+                    .page(data-page='index-3')
+                        .page-content
+                            .content-block-title Another plain static view
+                            .content-block
+                                p
+            #profile.view.tab
+                .pages.navbar-fixed
+                    .page(data-page='index-4')
+                        .navbar
+                            .navbar-inner
+                                .center 用户信息
+                        .page-content
+                            .list-block
+                                ul
+                                    li
+                                        .item-content
+                                            .item-media
+                                                i.icon.icon-form-name
+                                            .item-inner
+                                                .item-title.label Name
+                                                .item-input
+                                                    input(type='text', placeholder='Your name')
+                                    li
+                                        .item-content
+                                            .item-media
+                                                i.icon.icon-form-email
+                                            .item-inner
+                                                .item-title.label E-mail
+                                                .item-input
+                                                    input(type='email', placeholder='E-mail')
+                                    li
+                                        .item-content
+                                            .item-media
+                                                i.icon.icon-form-url
+                                            .item-inner
+                                                .item-title.label URL
+                                                .item-input
+                                                    input(type='url', placeholder='URL')
+                                    li
+                                        .item-content
+                                            .item-media
+                                                i.icon.icon-form-password
+                                            .item-inner
+                                                .item-title.label Password
+                                                .item-input
+                                                    input(type='password', placeholder='Password')
+                                    li
+                                        .item-content
+                                            .item-media
+                                                i.icon.icon-form-tel
+                                            .item-inner
+                                                .item-title.label Phone
+                                                .item-input
+                                                    input(type='tel', placeholder='Phone')
+                                    li
+                                        .item-content
+                                            .item-media
+                                                i.icon.icon-form-gender
+                                            .item-inner
+                                                .item-title.label Gender
+                                                .item-input
+                                                    select
+                                                        option Male
+                                                        option Female
+                                    li
+                                        .item-content
+                                            .item-media
+                                                i.icon.icon-form-calendar
+                                            .item-inner
+                                                .item-title.label Birth date
+                                                .item-input
+                                                    input(type='date', placeholder='Birth day', value='2014-04-30')
+                                    li
+                                        .item-content
+                                            .item-media
+                                                i.icon.icon-form-toggle
+                                            .item-inner
+                                                .item-title.label Switch
+                                                .item-input
+                                                    label.label-switch
+                                                        input(type='checkbox')
+                                    li
+                                        .item-content
+                                            .item-media
+                                                i.icon.icon-form-settings
+                                            .item-inner
+                                                .item-title.label Slider
+                                                .item-input
+                                                    .range-slider
+                                                        input(type='range', min='0', max='100', value='50', step='0.1')
+                            .content-block
+            //
+               Bottom Tabbar
+            .toolbar.tabbar.tabbar-labels
+                .toolbar-inner
+                    a#btn-userinfo.tab-link.active(href='#userinfo')
+                        i.icon.tabbar-demo-icon-1
+                        span.tabbar-label Userinfo
+                    a#btn-search.tab-link(href='#search')
+                        i.icon.tabbar-demo-icon-2
+                        span.tabbar-label Search
+           Path to Framework7 Library JS
+        script(type='text/javascript', src='js/framework7.min.js')
+        //
+           Path to your app js
+        script(type='text/javascript', src='js/my-app.js')
+        script(type='text/javascript', src='js/control.js')
