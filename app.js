@@ -10,14 +10,10 @@ var BongStrategy = require('passport-bong').Strategy;
 var SessionStore = require("session-mongoose")(express);
 
 var routes = require('./routes');
-
 var store = new SessionStore({
-    url: "mongodb://localhost/bong",
+    url: "mongodb://localhost/lu",
     interval: 120000 // expiration check worker run interval in millisec (default: 60000)
 });
-
-
-
 
 var app = express();
 
@@ -32,7 +28,7 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.session({
-    secret: 'bong',
+    secret: 'lu',
     cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//30 days
     store: store
 }));

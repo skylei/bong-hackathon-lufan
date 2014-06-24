@@ -1,20 +1,21 @@
 var passport = require('passport'),
     util = require('util'),
     User = require('../models/user.js'),
-    Monster = require('../models/monster.js'),
+    Bong = require('../models/bong.js'),
+    Rank = require('../models/rank.js'),
+    Msg = require('../models/msg.js'),
     request = require("request"),
     moment = require("moment"),
     BongStrategy = require('passport-bong').Strategy;
 
-
 // BONG CONF
-var BONG_CLIENT_ID = '1401421720575';
-var BONG_CLIENT_SECRET = '86b52a0b5b2a45e3ab10b29622bb704f';
+var BONG_CLIENT_ID = '1403270913261';// '1401421720575';
+var BONG_CLIENT_SECRET = '34fad8398f5440d6a194e4d85c508a7d';//'86b52a0b5b2a45e3ab10b29622bb704f';
 var BONG_HOST = 'http://open-test.bong.cn';
 var BONG_TOKEN_URL = BONG_HOST + '/oauth/token';
 var BONG_AUTHORIZATION_URL = BONG_HOST + '/oauth/authorize';
 var BONG_USERPROFILE_URL = BONG_HOST + '/1/userInfo/{$uid}';
-
+var BONG_USERLOGO_URL = BONG_HOST + '/1/userInfo/avatar/{$uid}';
 
 module.exports = function (app) {
     app.get('/', function (req, res) {
@@ -40,7 +41,7 @@ module.exports = function (app) {
             tokenURL: BONG_TOKEN_URL,
             clientID: BONG_CLIENT_ID,
             clientSecret: BONG_CLIENT_SECRET,
-            callbackURL: "/auth/bong/callback"
+            callbackURL: "/auth/bong/callback",
         },
         function (accessToken, refreshToken, profile, done) {
             process.nextTick(function () {
@@ -68,272 +69,246 @@ module.exports = function (app) {
                 });
             });
         }
-    ))
-    ;
+    ));
 
 
 //跳转到授权页面
-    app.get('/auth/bong',
-        passport.authenticate('bong'),
-        function (req, res) {
-            // The request will be redirected to bong for authentication, so this
-            // function will not be called.
-        });
+    app.get('/auth/bong', passport.authenticate('bong'), function (req, res) {
+    });
 
 //授权成功后回调页面
-    app.get('/auth/bong/callback',
-        passport.authenticate('bong', { failureRedirect: '/auth/bong' }),
-        function (req, res) {
-            // Successful authentication, redirect home.
+    app.get('/auth/bong/callback', passport.authenticate('bong', { failureRedirect: '/auth/bong' }), function (req, res) {
+        var rankInfo={
+            'uid': req.user.uid,
+            'rank': 0,
+            'exp': 0,
+            'time':moment(),
+        };
 
-            res.redirect('/all');
-        });
+        //save rank for first time
+        Rank.save(rankInfo,function (err,rank){
+            if(!err){
 
-//获取攻击者和被攻击者信息
-    app.get('/attack/muid=:muid/yuid=:yuid',
-        function (req, res) {
-            var muid = req.params.muid,
-                yuid = req.params.yuid,
-                mMonster,
-                yMonster,
-                Monsters = {"me": {}, "you": {}};
-            Monster.getMonsterByuID(muid, function (err, monster) {
-                if (err || !monster) {
-                    return res.send({"err": 0});
-                }
-                mMonster = monster;
-                Monster.getMonsterByuID(yuid, function (err, monster) {
-                    if (err || !monster) {
-                        return res.send({"err": 0});
-                    }
-                    yMonster = monster;
-                    Monsters.me = mMonster;
-                    Monsters.you = yMonster;
-                    res.json(Monsters);
-                });
-            });
-
-        });
-
-    //攻击空白页面
-    app.get('/attack',
-        function (req, res) {
-            res.render("/attack", {});
-        });
-
-    app.get('/all',
-        function (req, res) {
-            User.getUserByuID(req.user.uid, function (err, user) {
-                if (err || !user) {
-                    res.render('profile', {
-                        name: "null"
-                    });
-                }
-
-                if (!user.mid || user.mid == null) {
-                    return res.redirect("/monster");
-                }
-                //通过ID获取怪兽信息
-                Monster.getMonsterBymID(user.mid, function (err, monster) {
-                    //console.log(user.name);
-                    //console.log(monster.name);
-                    res.render("all", {
-                        myuID: req.user.uid
-                    });
-                });
-
-            });
-
-        });
-
-
-    //获取战斗信息并给赢得一方增加经验值
-    app.post('/addExp/muid=:muid/yuid=:yuid',
-        function (req, res) {
-            var muid = req.params.muid,
-                yuid = req.params.yuid,
-                resultFight = req.body.final;
-
-            console.log(muid);
-            console.log(yuid);
-            console.log(resultFight);
-            //var resultFight = req.body.fightCode;
-            //0代表我方赢得胜利，1代表对方赢得胜利
-            if (resultFight == 0) {
-                Monster.getMonsterByuID(muid, function (err, monster) {
-                    Monster.updateMonsterByuID(muid, {exp: monster.exp + 10}, function () {
-                        if (err) {
-                            return res.send({"err": 0});
-                        }
-                        return res.send({"err": 1});
-                    });
-                });
-            } else {
-                Monster.getMonsterByuID(yuid, function (err, monster) {
-                    Monster.updateMonsterByuID(yuid, {exp: monster.exp + 10}, function () {
-                        if (err) {
-                            return res.send({"err": 0});
-                        }
-                        return res.send({"err": 1});
-                    });
-                });
+            }else{
+                console.log(err);
             }
         });
 
-//个人信息页面
-    app.get('/profile',
-        function (req, res) {
-            User.getUserByuID(req.user.uid, function (err, user) {
-                if (err || !user) {
-                    res.render('profile', {
-                        name: "null"
-                    });
+        res.redirect('/all');
+    });
+
+//all of app
+    app.get('/all', function (req, res) {
+        User.getUserByuID(req.user.uid, function (err, user) {
+            if (!err || user) {
+                //res.json(user);
+                res.render('all', {myuID: user.uid});
+            }
+        });
+    });
+
+//get logo
+    app.get('/logo', function (req, res){
+        User.getUserByuID( req.user.uid, function (err,user){
+                
+            var url = BONG_HOST + "/1/userInfo/avatar/" + user.uid + "?access_token=" + user.token;
+            request({
+                url: url,
+                json: true
+            }, function (error, response, data) {
+                if (!error && response.statusCode === 200) {
+                    res.json(data.value); // Print the json response
+                }else{
+                    res.json(null);
                 }
-                if (!user.mid || user.mid == null) {
-                    return res.redirect("/monster");
+            });
+        });
+    });
+
+//get user
+    app.get('/user',function (req, res){
+        User.getUserByuID( req.user.uid, function (err,user){
+            if(!err && user){
+                res.json(user);
+            }else{
+                console.log('error');
+            }    
+        });
+    });
+
+//check register
+    app.get('/check/register',function (req, res){
+        Bong.getBongByUid(req.user.uid, function (err, bong) {
+            //check if you have regisiter today
+            if( bong!=undefined ){//have bong data, check if timeout
+                if (moment(bong.register).dayOfYear() < moment().dayOfYear()) {
+                    res.json({"result":false});
+                }else{
+                    res.json({"result":true});
                 }
-                //通过ID获取怪兽信息
-                Monster.getMonsterBymID(user.mid, function (err, monster) {
-                    console.log(user.name);
-                    console.log(monster);
-                    res.json({
-                        name: user.name,
-                        monsterName: monster.name,
-                        monsterHp: monster.hp,
-                        monsterAtk: monster.atk
-                    });
-                });
-
-            });
+            }else{//not have bong data, check if 
+                res.json({"result":false});
+            }
+                
         });
+    });
 
-//搜索页面
-    app.get('/search',
-        function (req, res) {
-            res.render('search', {
-            });
-        });
+//register
+    app.get('/register',function (req, res){
+        //get bong day message
+        User.getUserByuID(req.user.uid,function(err, user){
+            var url = BONG_HOST + "/1/bongday/dailysum/" + moment().subtract('days', 1).format("YYYYMMDD") + "?uid=" + user.uid + "&access_token=" + user.token;
+            request({
+                url: url,
+                json: true,
+            }, function (error, response, data) {
+                if (!error && response.statusCode === 200) {
+                    // Print the json response
+                    //console.log(data);
+                    // save json 
+                    data.value.uid = req.user.uid;
+                    data.value.register = moment();
+                    
+                    //remove old data
+                    Bong.removeBong({'uid':req.user.uid},function (err, bong){
+                        if(!err){
 
-    //获取所有用户信息
-    app.get('/search/getAllUsers',
-        function (req, res) {
-            var objUsers,
-                objMonsters,
-                objJson = {"userinfo": {}, "monster": {}},
-                obj = [],
-                newObj = [];
-            User.getAllUsers(function (err, users) {
-                objUsers = users;
-            });
-            Monster.getAllMonsters(function (err, monsters) {
-                objMonsters = monsters;
-
-                for (var i = 0; i < objUsers.length; i++) {
-                    if (req.user.uid != objUsers[i].uid) {
-
-                        var userinfo = objUsers[i],
-                            monster = objMonsters[i];
-                        objJson.userinfo = userinfo;
-                        objJson.monster = monster;
-                        obj.push(objJson);
-                        objJson = {};
-                        console.log(obj);
-                    }
-//                    console.log(newObj);
-                }
-                res.json(obj);
-
-            });
-            console.log("1");
-        });
-
-
-    //创建怪兽
-    app.get('/monster',
-        function (req, res) {
-            res.render('monster', {
-//                date: moment().subtract('days', 1).format("YYYYMMDD")
-            });
-        });
-
-    //签到
-    app.get('/register',
-        function (req, res) {
-//签到成功返回1，签到失败返回0
-            Monster.getMonsterByuID(req.user.uid, function (err, monster) {
-                console.log(moment());
-                if (monster.register == null || moment(monster.register).dayOfYear() < moment().dayOfYear()) {
-                    User.getUserByuID(req.user.uid, function (err, user) {
-                        var url = BONG_HOST + "/1/bongday/dailysum/" + moment().subtract('days', 1).format("YYYYMMDD") + "?uid=" + user.uid + "&access_token=" + user.token;
-                        console.log(url);
-                        request({
-                            url: url,
-                            json: true
-                        }, function (error, response, data) {
-
-                            if (!error && response.statusCode === 200) {
-                                console.log(data); // Print the json response
-                                var newMonster = {
-                                    hp: monster.hp + data.value.sleepNum,
-                                    atk: monster.atk + (data.value.calories / 100),
-                                    register: moment()
-                                };
-                                //存储怪兽信息初始化
-                                Monster.updateMonsterByuID(req.user.uid, newMonster, function (err, monster) {
-                                    if (err) {
-                                        return res.send({"err": 0});
-                                    }
-                                    return res.send({"err": 1});
-                                });
-                            }
-                        })
-                    });
-                } else {
-                    res.send({"err": 0});
-                }
-
-
-            });
-        });
-
-    app.post('/monster',
-        function (req, res) {
-            var monsterName = req.body.name;
-            User.getUserByuID(req.user.uid, function (err, user) {
-                var url = BONG_HOST + "/1/bongday/dailysum/" + moment().subtract('days', 1).format("YYYYMMDD") + "?uid=" + user.uid + "&access_token=" + user.token;
-                console.log(url);
-                request({
-                    url: url,
-                    json: true
-                }, function (error, response, data) {
-
-                    if (!error && response.statusCode === 200) {
-                        console.log(data); // Print the json response
-                        var newMonster = {
-                            name: monsterName,
-                            sex: 1,
-                            birthday: moment(),
-                            hp: data.value.sleepNum,
-                            atk: data.value.calories / 100,
-                            uid: req.user.uid
-                        };
-                        //存储怪兽信息初始化
-                        Monster.save(newMonster, function (err, monster) {
-                            if (err) {
-                                return res.redirect("/monster");
-                            }
-                            User.updateUserByuID(req.user.uid, {mid: monster._doc._id}, function (err, user) {
-                                //成功跳转到个人页面
-                                if (err) {
-                                    return res.redirect("/monster");
+                        }else{
+                            console.log(err);
+                        }
+                    }); 
+                    //save new data
+                    Bong.save(data.value,function(err,callback){
+                        if(!err){
+                            Rank.updateRank({"uid":req.user.uid},{"fightTimes":4},function (err, rank){
+                                if(!err){
+                                    res.json({'result':true});
+                                }else{
+                                    res.json({'result':false});
                                 }
-                                res.redirect("/all");
                             });
-                        });
-                    }
-                })
+                        }else{
+                            console.log(err);
+                            res.json({'result':false});
+                        }
+                    });
+                }
             });
         });
+    });
 
+//get bong today
+    app.get('/bong', function (req, res){
+        var args={
+            'uid': req.user.uid,
+        }
+        Bong.getBong(args, function (err, bong) {
+            res.json(bong);
+        });  
+    });
+
+//add message
+    app.post('/add/message/msg=:msg/parent=:parent', function (req, res){
+        var parent ;//= req.params.parent ? req.params.parent : 'null';
+        var args = {
+            'uid': req.user.uid,
+            'msg': req.params.msg,
+            'parent': parent,
+            'time': moment(),
+        };
+
+        Msg.save(args,function (err,msg){
+            if(!err){
+                res.json({'result':true});
+            }else{
+                res.json({'result':false});
+            }
+        });
+    });
+
+//get message
+    app.get('/get/msg', function (req, res){
+        Msg.getMsg({},function (err, msg){
+            if(!err){
+                res.json(msg);
+            }else{
+                res.json(false);
+            }    
+        });
+    });
+
+//update rank and exp
+    app.post('/update/rank/exp=:exp/fightTimes=:fightTimes', function (req, res){
+        Rank.getRank({'uid': req.user.uid}, function (err, ranks){
+            if(!err){
+                ranks=ranks[0];
+                var updateInfo = {
+                    'fightTimes': req.params.fightTimes,
+                    'exp': Number(ranks.exp) + Number(req.params.exp),
+                };
+                console.log(updateInfo);
+                Rank.updateRank({'uid': req.user.uid}, updateInfo, function (err, rank){
+                    if(!err){
+                        res.json({'result':true});
+                    }else{
+                        console.log(err);
+                        res.json({'result':false});
+                    }
+                });
+            }else{
+                console.log(err);
+            }
+        });
+    });
+
+//minus fight times
+    /*app.post("/minus/fightTimes", function (req, res){
+
+    });*/
+
+//get rank and exp
+    app.get('/get/rank', function (req, res){
+        
+        var myrank;
+        var count = 1;//my rank
+        var allCount = 0;//all count
+
+        Rank.getRank({'uid': req.user.uid},function (err, myranks){
+            if(!err && myranks){
+                myrank = myranks[0];                
+            }else{
+                console.log(err);
+            }
+        });
+
+        Rank.getRank({},function (err,ranks){
+            
+            ranks.forEach(function (r){
+                allCount++;
+                //add my rank +1
+                if( r.exp > myrank.exp ){
+                    count++;
+                }
+            });
+            
+            Rank.updateRank({'uid': req.user.uid}, {'rank': count}, function (err,updaterank){
+                if(!err && updaterank){
+                    Rank.getRank({'uid': req.user.uid},function (err,getrank){
+                        //console.log(getrank);
+                        if(!err && getrank){
+                            var rankPersonal = getrank[0];
+                            //rankPersonal[1]=({"number":allCount});
+                            //console.log(rankPersonal);
+                            res.json(rankPersonal);
+                        }else{
+                            console.log(err);
+                        }
+                    });
+                }else{
+                    console.log(err);
+                }
+            });
+        }); 
+    });     
 
 };

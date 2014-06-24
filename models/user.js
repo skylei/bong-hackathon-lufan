@@ -1,7 +1,6 @@
 var mongodb = require('./mongodb');
 
 var Schema = mongodb.mongoose.Schema;
-
 var UserSchema = new Schema({
     mid: String,
     name: String,
@@ -16,11 +15,8 @@ var UserSchema = new Schema({
     create: Date,
     uid: String
 });
-
 var User = mongodb.mongoose.model("User", UserSchema);
-
-var UserDAO = function () {
-};
+var UserDAO = function(){};
 
 //存入用户信息
 UserDAO.prototype.save = function (user, callback) {

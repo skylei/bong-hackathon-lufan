@@ -1,204 +1,361 @@
 $(document).ready(function() {
-
-    localStorage.setItem("fight",0);
-
-    /* get发包 */
-    /* profile */
-    $.ajax({
-        type: "get",
-        url: "/profile",
-        beforeSend: function (XMLHttpRequest) {
-        },
-        success: function (data, textStatus) {
-            console.log(data);
-            $("#userinfo-title").html(data.monsterName);
-            $("#userinfo-name").html(data.name);
-            $("#userinfo-monsterAtk").attr("width", data.monsterAtk);
-            $("#userinfo-monsterAtk-show").html( parseInt(data.monsterAtk,10) + " 力量");
-            $("#user-info-monsterHp").attr("width", data.monsterHp);
-            $("#user-info-monsterHp-show").html(data.monsterHp + " 血");
-        },
-        complete: function (XMLHttpRequest, textStatus) {
-
-        },
-        error: function () {
+    //for fight 
+        var result = '';
+        var throw_times=0;
+        var goal=0;
+    
+        function Orientation(selector) {
+                
         }
-    });
+                
+        Orientation.prototype.init = function(){
+            throw_times=0;
+            goal=0;
+            window.addEventListener('deviceorientation', this.orientationListener, false);
+            window.addEventListener('MozOrientation', this.orientationListener, false);
+            window.addEventListener('devicemotion', this.orientationListener, false);
+        }
+                
+        Orientation.prototype.orientationListener = function(evt) {
+            // For FF3.6+
+            if (!evt.gamma && !evt.beta) {
+            // angle=radian*180.0/PI 在firefox中x和y是弧度值,
+            evt.gamma = (evt.x * (180 / Math.PI)); //转换成角度值,
+            evt.beta = (evt.y * (180 / Math.PI)); //转换成角度值
+            evt.alpha = (evt.z * (180 / Math.PI)); //转换成角度值
+        }
+        /* beta:  -180..180 (rotation around x axis) */
+        /* gamma:  -90..90  (rotation around y axis) */
+        /* alpha:    0..360 (rotation around z axis) (-180..180) */
+          
+        var gamma = evt.gamma;
+        var beta = evt.beta;
+        var alpha = evt.alpha;
+                  
+        if(evt.accelerationIncludingGravity){
+            // window.removeEventListener('deviceorientation', this.orientationListener, false);
+            gamma = event.accelerationIncludingGravity.x*10;
+            beta = -event.accelerationIncludingGravity.y*10;
+            alpha = event.accelerationIncludingGravity.z*10;
+        }
+                      
+        if (this._lastGamma != gamma || this._lastBeta != beta || this._lastAlpha != alpha) {
+            //document.querySelector("#test").innerHTML = "x: "+ beta.toFixed(2) + " y: " + gamma.toFixed(2) + " z: " + (alpha != null?alpha.toFixed(2):0);
+            var str = "x: "+ beta.toFixed(2) + " y: " + gamma.toFixed(2) + " z: " + (alpha != null?alpha.toFixed(2):0)+"<br><br>";
+            result += str;
 
-    /* search */
-    $("#btn-search").click(function () {
+            var style = document.querySelector("#fight-pointer").style;
+                style.left = gamma/90 * 300 + 200 +"px";
+                style.top = beta/90 * 300 + 200 +"px";
+                       
+                this._lastGamma = gamma;
+                this._lastBeta = beta;
+                this._lastAlpha = alpha;
+
+                var limit = 60; 
+
+                if(gamma>limit){
+                    goal+=gamma;
+                }
+                if(beta>limit){
+                    goal+=beta;
+                }
+                if(alpha>limit){
+                    goal+=alpha;
+                }
+
+                //total all data
+                throw_times++;
+                goal=goal/3;
+            
+            $("#fight-test").html(result);
+        }
+        
+    };
+
+    //set localStorage
+    localStorage.setItem("is_message",0);
+    localStorage.setItem("is_fight",0);
+    localStorage.setItem("fight_times",0);
+
+    function init(){
+        $(".fight-show").slideUp(1);
+    }
+
+    //onload
+    function autoload(){
+        //init message for user and bong
         $.ajax({
             type: "get",
-            url: "/search/getAllUsers",
-            beforeSend: function (XMLHttpRequest) {
-            },
+            url: "/logo",
+            beforeSend: function (XMLHttpRequest) {},
             success: function (data, textStatus) {
-                console.log(data);
-                var html = '';
-                $.each(data, function (n) {
-                    console.log(data[n]);
-                    html += '<li><a href="#" class="search-item item-link" data='+data[n].userinfo.uid+'><div class="item-content"><div class="item-inner"><div class="search-title">' + data[n].monster.name + '</div><div class="search-rank">' + data[n].monster.hp + '</div><div class="fight">决斗</div></div></div></a></li>';
-                });
-                $("#search-panel").html(html);
-
-                if( localStorage.getItem("fight")==0 ) {
-                    $(".search-panel").slideDown(1000);
-                    $(".fight-panel").slideUp(1000);
-                }
-
-                cilckevent();
+                $("#userinfo-logo img").attr("src", "data:image/gif;base64,"+data);
             },
             complete: function (XMLHttpRequest, textStatus) {
+                $.get('/check/register', {}, function (data1){
+                    //if have register
+                    if(data1.result){
+                        var str = '';
+                        var result;
+                        $('#btn-register').remove();//.addClass('hidden');
+                        
+                        $.get('/bong', {}, function (data2){
+                            //get yesterday bong data
+                            if(data2){
+                                result = data2[0];
+                                console.log(result);
+                                str='<table class="userinfo-bong-day"><tr><td>您昨天的bong点:</td></tr><tr><td>卡路里:</td><td><div id="userinfo-bong-calorie" class="progress progress-striped active"><div role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;" class="progress-bar"><span id="userinfo-bong-calorie-show" class="sr-only">'+result.calories+'</span></div></div></td><tr><tr><td>移动距离:</td><td><div id="userinfo-bong-calorie" class="progress progress-striped active"><div role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;" class="progress-bar"><span id="userinfo-bong-calorie-show" class="sr-only">'+result.distance+'</span></div></div></td><tr><tr><td>静坐时间:</td><td><div id="userinfo-bong-calorie" class="progress progress-striped active"><div role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;" class="progress-bar"><span id="userinfo-bong-calorie-show" class="sr-only">'+result.stillTime+'</span></div></div></td><tr><tr><td>睡眠时间:</td><td><div id="userinfo-bong-calorie" class="progress progress-striped active"><div role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;" class="progress-bar"><span id="userinfo-bong-calorie-show" class="sr-only">'+result.sleepNum+'</span></div></div></td><tr></table>';
+                                $('.userinfo-bong').html(str);
 
+                                //get fight times
+                                $.get("/get/rank", function (data){
+                                    $('#userinfo-fight-times-show').html( data.fightTimes );
+                                    localStorage.setItem("fight_times",data.fightTimes);
+                                }, "json");
+                            }
+                        },"json");
+
+                    }else{
+                        $("#btn-register").html("点击签到!!");
+                    }
+                },"json");
             },
-            error: function () {
-            }
-        });
-    });
-
-    function cilckevent() {
-        $(".search-item").click(function () {
-
-            localStorage.setItem("fight",1);
-
-            $(".search-panel").slideUp(1000);
-            $(".fight-panel").slideDown(1000);
-
-            //$("#btn-result").fadeIn(100).slideDown(1000);
-
-            $.ajax({
-                type: "get",
-                url: "/attack/muid="+$(this).attr("data")+"/yuid="+$(".hidden").html(),
-                beforeSend: function (XMLHttpRequest) {
-                },
-                success: function (data, textStatus) {
-                    console.log(data);
-
-                    $("#blood .progress-bar").attr('width',data["me"].hp);
-                    $("#blood .progress-bar .sr-only").html(data["me"].hp+"血量");
-
-                    /* localstorage save */
-                    localStorage.setItem("all_blood",data["me"].hp);
-                    localStorage.setItem("me-hp",data["me"].hp);
-                    localStorage.setItem("me-attack",data["me"].atk);
-                    localStorage.setItem("me-exp",data["me"].exp);
-
-                    localStorage.setItem("you-hp",data["you"].hp);
-                    localStorage.setItem("you-attack",data["you"].atk);
-                    localStorage.setItem("you-exp",data["you"].exp);
-
-                    localStorage.setItem("yuid",data["you"].uid);
-                    localStorage.setItem("muid",data["me"].uid);
-
-                    var times = localStorage.setItem("times",3);
-                },
-                complete: function (XMLHttpRequest, textStatus) {
-
-                },
-                error: function () {
-                }
-            });
+            error: function () {}
         });
     }
 
-        $(".fight-panel li").click(function () {
-            if (!$(this).hasClass("clicked")) {
-                console.log($(this));
-                $(".fight-sign").slideDown(500);
-                $(".fight-sign").slideUp(1000);
-                $(this).slideUp(1000);//addClass("clicked");
-
-                var times = localStorage.getItem("times");
-                times-=1;
-                localStorage.setItem("times",times);
-
-                var me_atk=localStorage.getItem("me-attack")*( 1+0.5*localStorage.getItem("me-exp") )/100;
-                var you_atk=localStorage.getItem("you-attack")*( 1+0.5*localStorage.getItem("you-exp") )/100;
-
-                var me_blood = localStorage.getItem("me-hp")-you_atk;
-                var you_blood = localStorage.getItem("you-hp")-me_atk;
-
-                console.log(me_atk);
-                console.log(times);
-
-                /* 1 for my success */
-                if( me_blood<0 ){
-                    result(0);
-                }else if( you_blood<0 ){
-                    result(1);
-                }else if(times==0){
-                    if( me_blood>you_blood){
-                        result(1);
-                    }else{
-                        result(0);
-                    }
-                }
-
-                localStorage.setItem("you-hp",you_blood);
-                localStorage.setItem("me-hp",me_blood);
-
-                /* 扣血 */
-                //alert(localStorage.getItem("all_blood") );
-                var pecent = me_blood/(localStorage.getItem("all_blood"));
-                pecent = parseInt( pecent*100,10 );
-                console.log(pecent);
-                $("#blood-bar").attr({'width':pecent+'%','aria-valuenow':pecent});
-                $("#blood .progress-bar .sr-only").html( parseInt(me_blood,10)+"血量");
-            }
-        });
-
-        $("#btn-result").click(function(){
-            var you_blood= localStorage.getItem("you-hp");
-            var me_blood = localStorage.getItem("me-hp");
-            if( you_blood>me_blood ){
-                result(0);
-            }else{
-                result(1);
-            }
-        });
-
-        function result( data ){
-            localStorage.setItem("fight",0);
-            /* 1 is you win */
-            var final = 0;
-            if(data){
-                final = 0;
-                alert("耶，你赢啦~~");
-            }else{
-                final = 1 ;
-                alert("哎呀，输了，兽兽累了。");
-            }
-            var args={
-                muid:localStorage.getItem("muid"),
-                yuid:localStorage.getItem("yuid"),
-                final: final
-            }
-
-            console.log(args);
-            $.post('/addExp/muid='+localStorage.getItem("muid")+'/yuid='+localStorage.getItem("yuid"), args, function (data){
-                console.log(data);
-                if (data.result) {
-
-                } else {
-
-                }
-            },"json");
-
-            location.reload();
-        }
-
-    /* 签到 */
-    $("#btn-register").click(function(){
-        var args={}
-        $.get('/register', args, function (data){
-            console.log(data);
-            if (data.err == "1" ) {
-                alert("今天到咯~~");
-                location.reload();
-            } else {
-                alert("你今天已经来看你的宠物咯~~");
+    $("#btn-register").click(function (e){
+        $.get('/register', function (data){
+            if(data.result){
+                location.href="/";
             }
         },"json");
     });
-	$(".fight-sign").slideUp(1);
+
+    $('#message-submit').click(function (e){
+        var msg = $('#message-textarea').val();
+        var parent = 'null';
+        var url='/add/message/msg='+msg+'/parent='+parent;
+        
+        if(msg==''){
+            alert('please input message!');
+        }else{
+            //console.log(url);
+            $.post(url, {}, function (data){
+                if(data.result){
+                    alert("send successfully!!");
+                    $('#message-textarea').val('');
+                    $('#btn-message').click();
+                }
+            },"json");
+        }
+    });
+
+    $("#btn-message").click(function (e){
+        var allmessage ='';
+        if(1){//localStorage.getItem("is_message")==0 ){
+            //first cilck for message,load message
+            $.get('/get/msg', function (data){
+                console.log(data);
+                if(data){
+                    //show message
+                    var count = 0;
+                    for( var item in data){
+                        count++;
+                        var msg = data[item].msg,
+                            time = data[item].time,
+                            uid = data[item].uid;
+                        var str = '<tr><td>' + count + ' 楼: '+ time.substring(5,10)  +'</td><td>'+msg+'</td></tr>';
+                        var allmessage = str + allmessage ;
+                        $("#message-show").slideUp(1);
+                        $("#message-show").html(allmessage).slideDown(1000); 
+                        //$(str).appendTo("#message-show"); 
+                    }
+
+                    localStorage.setItem("is_message",1);
+                }
+            }, "json");
+        }
+    });
+
+//next part for fight
+    function start_orientation (){
+        //start now
+        //var start = Date.now();
+        var time = 0;
+        var second_times=3;
+        $("#menubar").slideUp(1000);
+
+        (new Orientation()).init();
+        
+        setInterval(function (){
+            second_times++;
+            if(second_times%2){
+
+                var fight_times = localStorage.getItem('fight_times');
+                fight_times-=0.5;
+                localStorage.setItem("fight_times", fight_times);
+
+                $.post('/update/rank/exp='+ goal/200 + '/fightTimes=' + fight_times, function (data){
+                    if(data.result){
+
+                        if(goal<100){   
+                            alert("太low了，才：" + goal + "分");
+                        }else if( 100<goal<200){  
+                            alert("还不错，再甩一把：" + goal + "分");
+                        }else{  
+                            alert("果真撸神：" + goal + "分");
+                        }
+
+                        location.href='/';
+                    }else{
+                        //console.log(data);
+                    }
+                }, "json");
+            }else{
+                //location.href='/';
+            }
+        },10000);
+    }
+
+    function loadingCallback(){
+        $('#fight-loadingbar').remove();
+        $(".fight-show").slideDown(500);
+        start_orientation ();
+    }
+
+    function fightLoading(percent){
+
+        $('#fight-progress span').animate({width:percent},500,function(){
+            fightLoop();
+            $(this).children().html(percent);
+            if(percent=='100%'){
+                $(this).children().html('加载完成...&nbsp;&nbsp;&nbsp;&nbsp;');
+                setTimeout(function(){
+                    loadingCallback();
+                },1000);
+            }
+        });
+    }
+
+    //loop for loading bar
+    var loopNumber = 0;
+    var loopPercent;
+    var i_dont_know_reason=0;
+    function fightLoop(){
+        if(loopNumber<=90){
+            i_dont_know_reason++;
+            setTimeout(function (){
+                loopNumber += 20;
+                loopPercent = loopNumber+"%";
+                if( i_dont_know_reason%2 ){
+                    //console.log(loopNumber);
+                    fightLoading(loopPercent);
+                }
+            },400);
+        }
+    }
+
+    function fightListener(){
+        //listen start click
+        $("#fight-btn-start").click(function (e){
+            $("#fight-start").remove();
+            $("#fight-loadingbar").slideDown(200);
+            fightLoop();            
+        });
+    }
+
+    function fightShowInfo(){
+        //scroll to show info of fight   
+        var info = [
+        '撸友会是一个测定你甩手机速度的小游戏～～',
+        '只有撸神知道哦～～',
+        '每日签到可以增加撸赛机会哦～～',
+        '一次比赛只有20秒哦～～',
+        '注意你的手机，不要把手机扔出去哦！！！',
+        '看看你的手速有多快！！',
+        '游戏主要通过测定重力感应的到你的手速～～',
+        ];
+        setInterval(function(){
+            var rand = Math.ceil(Math.random()*7);
+            $('.fight-info').html(info[rand]);
+        },1500); 
+    }
+
+    //go fight
+    $("#btn-fight").click(function (e){
+        //init for fight
+        localStorage.setItem("state",0);
+        $("#fight-loadingbar").fadeOut(1);
+
+        $.get('/check/register',function (data){
+            if(data.result){
+                //check if hava fight times
+                $.get("/get/rank",function (data){
+                    if(data.fightTimes>0){
+                        fightListener();
+                        fightShowInfo();
+                    }else{
+                        alert("今天已经用完了撸赛机会，赶快去bong一下，换取明天的机会！！");
+                        location.href="/";
+                    }
+                },"json");
+                
+                //have register
+                /*if( localStorage.getItem("is_fight")==0 ){
+                    var start = Date.now();
+                    var count = 0;
+                    $('.container').slideDown(100);
+            
+                    function roop(){
+                        //var count = Date.now()-start;
+                        count++;
+                        var percent=count;
+                        if(1){
+                            loading(percent);
+                        }
+                        console.log(count);
+                    }
+                    var rooploading = setInterval(roop,1);
+                }*/
+            }else{
+                alert("请先签到！！");
+                location.href="/";
+            }
+        }, "json");
+    });
+
+//next part for userinfo
+    $("#userinfo").click(function (e){
+        //update rank
+
+    });
+
+//next part for rank
+    $("#btn-rank").click(function (e){
+
+        $.get('/user',function (data){
+            if(data){
+                console.log(data);
+                $('#userinfo-title').html(data.name);
+                $('#userinfo-calorie-show').html(data.targetCalorie);
+                $('#userinfo-sleeptime-show').html(data.targetSleepTime);
+                $('#userinfo-weight-show').html(data.weight);
+                $('#userinfo-height-show').html(data.height);
+
+                $.get('/get/rank',function (data){
+                    if(data){
+                        $("#userinfo-exp-show").html(data.exp);
+                        $("#userinfo-rank-show").html(data.rank);
+                    }
+                }, "json");
+            }
+        },"json");
+    });
+
+    autoload();
+    init();
+
 });
+

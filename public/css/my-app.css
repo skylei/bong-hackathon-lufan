@@ -1,5 +1,9 @@
 /* Your app custom files in this file */
 /* Tab bar icons */
+body,table,td,div{
+  font-family: "微软雅黑";
+}
+
 i.tabbar-demo-icon-1 {
   width: 30px;
   height: 30px;
@@ -115,6 +119,12 @@ i.tabbar-demo-icon-4 {
   text-align: center;
 }
 
+#userinfo-title,.register .btn,#userinfo-data table tr td{
+  -moz-text-shadow: 3px 3px 5px rgba(0,0,0, 0.5);
+  -webkit-text-shadow: 3px 5px 8px rgba(0,0,0, 0.5);
+  text-shadow: 3px 3px 5px rgba(0,0,0,0.5);
+}
+
 #userinfo-title,#userinfo-name{
   font-family: "微软雅黑";
   font-size: 18px;
@@ -164,6 +174,7 @@ i.tabbar-demo-icon-4 {
 #search-title{
   font-family: "微软雅黑";
   font-size: 20px;
+  -moz-text-shadow:4px 5px 10px #4F4F4F; -webkit-text-shadow:4px 5px 10px #4F4F4F; text-shadow:4px 5px 10px #4F4F4F;
 }
 
 /* fight */
@@ -184,7 +195,7 @@ i.tabbar-demo-icon-4 {
   width:100%;
   height:100%;
   z-index:999;
-  background:url(../img/fight.gif) 50% 50% no-repeat #fff;
+  /*background:url(../img/fight.gif) 50% 50% no-repeat #fff;*/
 }
 
 .clicked{
@@ -213,3 +224,195 @@ i.tabbar-demo-icon-4 {
 }
 
 .form-control{display:block;width:100%;height:34px;padding:6px 12px;font-size:14px;line-height:1.428571429;color:#555;vertical-align:middle;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);-webkit-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6)}.form-control:-moz-placeholder{color:#999}.form-control::-moz-placeholder{color:#999;opacity:1}.form-control:-ms-input-placeholder{color:#999}.form-control::-webkit-input-placeholder{color:#999}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{cursor:not-allowed;background-color:#eee}textarea.form-control{height:auto}.form-group{margin-bottom:15px}.radio,.checkbox{display:block;min-height:20px;padding-left:20px;margin-top:10px;margin-bottom:10px;vertical-align:middle}.radio label,.checkbox label{display:inline;margin-bottom:0;font-weight:normal;cursor:pointer}.radio input[type="radio"],.radio-inline input[type="radio"],.checkbox input[type="checkbox"],.checkbox-inline input[type="checkbox"]{float:left;margin-left:-20px}.radio+.radio,.checkbox+.checkbox{margin-top:-5px}.radio-inline,.checkbox-inline{display:inline-block;padding-left:20px;margin-bottom:0;font-weight:normal;vertical-align:middle;cursor:pointer}.radio-inline+.radio-inline,.checkbox-inline+.checkbox-inline{margin-top:0;margin-left:10px}input[type="radio"][disabled],input[type="checkbox"][disabled],.radio[disabled],.radio-inline[disabled],.checkbox[disabled],.checkbox-inline[disabled],fieldset[disabled] input[type="radio"],fieldset[disabled] input[type="checkbox"],fieldset[disabled] .radio,fieldset[disabled] .radio-inline,fieldset[disabled] .checkbox,fieldset[disabled] .checkbox-inline{cursor:not-allowed}.input-sm{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-sm{height:30px;line-height:30px}textarea.input-sm{height:auto}.input-lg{height:46px;padding:10px 16px;font-size:18px;line-height:1.33;border-radius:6px}select.input-lg{height:46px;line-height:46px}textarea.input-lg{height:auto}.has-warning .help-block,.has-warning .control-label,.has-warning .radio,.has-warning .checkbox,.has-warning .radio-inline,.has-warning .checkbox-inline{color:#8a6d3b}
+
+#message-btn{
+  width: 100%;
+}
+
+#message-submit{
+  width: 95%;
+  border-radius: 10px;
+}
+
+/*loading bar*/
+#fight {
+  color: #404040;
+  background: #fafafa;
+}
+
+#fight-loadingbar {
+  font: 13px '微软雅黑', Tahoma, Verdana, sans-serif;
+  margin: 100px auto;
+  width: 80%;
+}
+#fight-loadingbar > div {
+  margin-bottom: 20px;
+}
+
+.progress {
+  width: 100%;
+  height: 22px;
+  background: #ebebeb;
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  border-radius: 15px;
+}
+.progress > span {
+  position: relative;
+  float: left;
+  margin: 0 -1px;
+  width: 90%;
+  min-width: 30px;
+  height: 20px;
+  line-height: 16px;
+  text-align: right;
+  background: #cccccc;
+  border: 1px solid;
+  border-color: #bfbfbf #b3b3b3 #9e9e9e;
+  border-radius: 12px;
+  background-image: -webkit-linear-gradient(top, #f0f0f0, #dbdbdb 70%, #cccccc);
+  background-image: -moz-linear-gradient(top, #f0f0f0, #dbdbdb 70%, #cccccc);
+  background-image: -o-linear-gradient(top, #f0f0f0, #dbdbdb 70%, #cccccc);
+  background-image: linear-gradient(to bottom, #f0f0f0, #dbdbdb 70%, #cccccc);
+  -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.progress > span > span {
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #404040;
+  color: rgba(0, 0, 0, 0.7);
+  text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+}
+.progress > span:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  height: 18px;
+  background: url("../img/progress.png") 0 0 repeat-x;
+  border-radius: 10px;
+}
+.progress .green {
+  background: #85c440;
+  border-color: #78b337 #6ba031 #568128;
+  background-image: -webkit-linear-gradient(top, #b7dc8e, #99ce5f 70%, #85c440);
+  background-image: -moz-linear-gradient(top, #b7dc8e, #99ce5f 70%, #85c440);
+  background-image: -o-linear-gradient(top, #b7dc8e, #99ce5f 70%, #85c440);
+  background-image: linear-gradient(to bottom, #b7dc8e, #99ce5f 70%, #85c440);
+}
+.progress .red {
+  background: #db3a27;
+  border-color: #c73321 #b12d1e #8e2418;
+  background-image: -webkit-linear-gradient(top, #ea8a7e, #e15a4a 70%, #db3a27);
+  background-image: -moz-linear-gradient(top, #ea8a7e, #e15a4a 70%, #db3a27);
+  background-image: -o-linear-gradient(top, #ea8a7e, #e15a4a 70%, #db3a27);
+  background-image: linear-gradient(to bottom, #ea8a7e, #e15a4a 70%, #db3a27);
+}
+.progress .orange {
+  background: #f2b63c;
+  border-color: #f0ad24 #eba310 #c5880d;
+  background-image: -webkit-linear-gradient(top, #f8da9c, #f5c462 70%, #f2b63c);
+  background-image: -moz-linear-gradient(top, #f8da9c, #f5c462 70%, #f2b63c);
+  background-image: -o-linear-gradient(top, #f8da9c, #f5c462 70%, #f2b63c);
+  background-image: linear-gradient(to bottom, #f8da9c, #f5c462 70%, #f2b63c);
+}
+.progress .blue {
+  background: #5aaadb;
+  border-color: #459fd6 #3094d2 #277db2;
+  background-image: -webkit-linear-gradient(top, #aed5ed, #7bbbe2 70%, #5aaadb);
+  background-image: -moz-linear-gradient(top, #aed5ed, #7bbbe2 70%, #5aaadb);
+  background-image: -o-linear-gradient(top, #aed5ed, #7bbbe2 70%, #5aaadb);
+  background-image: linear-gradient(to bottom, #aed5ed, #7bbbe2 70%, #5aaadb);
+}
+
+.fight-wrapper{
+        text-align: center;
+        background:#000;
+        width:400px;
+        height:400px;
+        color:#fff;
+        border-radius:5px;
+      }
+#fight-pointer{
+        height:20px;
+        width:20px;
+        background:#fff;
+        position:relative;
+        border-radius:50%;
+        -moz-box-shadow: 5px 5px 10px rgba(255, 255, 255, 0.7) inset;
+        -webkit-box-shadow: 5px 5px 10px rgba(255, 255, 255, 0.7) inset;
+        box-shadow: 5px 5px 10px rgba(255, 255, 255, 0.7) inset;
+        -webkit-transition:all 0.1s ease-in;
+        -moz-transition:all 0.1s ease-in;
+      }
+#fight-test{
+        line-height: 30px;
+        text-align: center;
+        font-size:15px;
+        -webkit-text-size-adjust:none;
+        margin:6px;
+        border-radius: 10px;
+
+        -moz-text-shadow: 3px 3px 8px rgba(255,255,255, 0.5) inset;
+        -webkit-text-shadow: 3px 5px 8px rgba(255,255,255, 0.5) inset;
+        text-shadow: 3px 3px 8px rgba(255,255,255,0.5) inset;
+        
+        -moz-box-shadow: 5px 5px 10px rgba(0,0,0, 0.5) inset;
+        -webkit-box-shadow: 5px 5px 10px rgba(0,0,0, 0.5) inset;
+        box-shadow: 5px 5px 10px rgba(0,0,0, 0.5) inset;
+        
+        -webkit-animation: fight_show_font 5s ease-in;
+        animation: fight_show_font 5s ease-in;
+      }
+
+@keyframes fight_show_font{  /*动画标识名将被animation-name属性所引用*/
+   /*每一帧的动画效果，可以通过百分比数值加样式的形式来定义*/
+    0%{
+      font-size: 12px;    
+    }
+    50%{
+      font-size: 15px;
+    }       
+   100%{
+      font-size: 18px;  
+    }
+}
+
+#fight-start{
+  margin-top: 50px;
+  width: 100%;
+  text-align: center;
+}
+
+#fight-start button{
+  width: 100%;
+}
+
+#fight-show-wrapper-canvas{
+  width: 500px;
+  height: 500px;
+}
+#fight-show-canvas{
+  width: 500px;
+  height: 500px; 
+  background:#eee;
+}
+
+#search-title{
+
+}
+
+.fight-info{
+  font-family: "微软雅黑";
+  font-size: 15px;
+  -moz-text-shadow:4px 5px 10px #23332C; -webkit-text-shadow:4px 5px 10px #23332C; text-shadow:4px 5px 10px #23332C;
+}
+
+#rank-user-info{
+  width: 100%;
+}
