@@ -5,7 +5,7 @@ bong-hackathon-lufan
 
 #####About
 
-Lufan is a work work on bong hackathon and is based on nodejs,mongodb. We hope you to do more sport and hava fun with the game!Lufan is easy, you just start game and swing your phone, we will calculate your score by gravity sensor !
+Lufan is work on bong hackathon and is based on nodejs,mongodb. We hope you to do more sport and hava fun with the game!Lufan is easy, you just start game and swing your phone, we will calculate your score by gravity sensor !
 
 #####Start
 
