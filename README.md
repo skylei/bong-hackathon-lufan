@@ -1,18 +1,18 @@
 bong-hackathon-lufan
 ====================
 
-> You can ge to official website:  `http://bong.cn/`
+> You can ge to official website:  <http://bong.cn/>
 
-#####About
+####About
 
 Lufan is work on bong hackathon and is based on nodejs,mongodb. We hope you to do more sport and hava fun with the game!Lufan is easy, you just start game and swing your phone, we will calculate your score by gravity sensor !
 
-#####Start
+####Start
 
     cd bin
     node www
 
-#####Config
+####Config
 
 `/router/index.js` :
 
